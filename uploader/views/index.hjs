@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="description" content="Simple file uploading and sharing.">
+
+  <title>Upload </title>
+
+  <link rel="stylesheet" href="stylesheets/foundation.min.css">
+  <link rel="stylesheet" href="stylesheets/font/font.css">
+  <link rel="stylesheet" href="stylesheets/app.css">
+  <link rel="shortcut icon" href="images/circle.png">
+
+  <script>
+    var bucket_dir = "{{ bucket_dir }}";
+    var aws_key = "{{ aws_key }}";
+    var acl = "public-read";
+    var redirect = "{{ redirect_host }}";
+  </script>
+
+  <!-- GA -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-36907732-2']);
+    _gaq.push(['_setDomainName', 'alfg.co']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+</head>
+<body>
+
+  <div id="drop" class="panel">
+    <div id="circle"></div>
+    <div id="title">
+      <h2 class="title">Upload</h2>
+    </div>
+
+    <h4>Select a file here</h4>
+
+
+    <form id="formId" action="http://{{ aws_bucket }}.{{ host }}" method="post" enctype="multipart/form-data" class="direct-upload">
+      <input type="hidden" name="key">
+      <input type="hidden" name="AWSAccessKeyId" value="{{ aws_key }}">
+      <input type="hidden" name="acl" value="public-read">
+      <input type="hidden" name="policy">
+      <input type="hidden" name="signature">
+      <input type="hidden" name="success_action_status" value="201">
+      <input type="hidden" name="Content-Type" value="video/*">
+
+      <input class="file-input" name="file" type="file">
+
+    </form>
+    <div class="progress round eight"><span class="meter"></span></div>
+    <input class="share-url" type="text" />
+  </div>
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="javascripts/jquery.lettering.js"></script>
+  <script src="javascripts/jquery.ui.widget.js"></script>
+  <script src="javascripts/jquery.fileupload.js"></script>
+  <script src="javascripts/app.js"></script>
+
+  <script>
+      $(document).ready(function() {
+        $(".title").lettering();
+        $("#formId").submit( function(submitEvent) {
+
+    // get the file name, possibly with path (depends on browser)
+    var filename = $("#file_input").val();
+
+    // Use a regular expression to trim everything before final dot
+    var extension = filename.replace(/^.*\./, '');
+
+    // Iff there is no dot anywhere in filename, we would have extension == filename,
+    // so we account for this possibility now
+    if (extension == filename) {
+        extension = '';
+    } else {
+        // if there is an extension, we convert to lower case
+        // (N.B. this conversion will not effect the value of the extension
+        // on the file upload.)
+        extension = extension.toLowerCase();
+    }
+
+    switch (extension) {
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+            alert("it's got an extension which suggests it's a PNG or JPG image (but N.B. that's only its name, so let's be sure that we, say, check the mime-type server-side!)");
+
+        // uncomment the next line to allow the form to submitted in this case:
+//          break;
+
+        default:
+            // Cancel the form submission
+            submitEvent.preventDefault();
+    }
+
+});
+      });
+  </script>
+
+
+</body>
+</html>
